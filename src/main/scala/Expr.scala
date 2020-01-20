@@ -24,6 +24,6 @@ case class Or(args: List[Expr]) extends Expr {
 
 case class Not(arg: Expr) extends Expr {
   override def toString(): String = {
-    "~" + "(" + arg.toString() + ")"
+    "~" + arg.toString()
   }
 }

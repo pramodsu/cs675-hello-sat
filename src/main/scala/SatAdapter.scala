@@ -1,18 +1,32 @@
 package SatExample
 
+import scala.collection.mutable.HashMap
+
 abstract class Literal {
-  def variable() : String
+  val variable : Int
+  def unary_~() : Literal
+  def toInt : Int
 }
 
-case class PositiveLiteral(name: String) extends Literal {
-  override def toString() : String = name
-  override def variable() = name
+case class PositiveLiteral(v: Int) extends Literal {
+  override def toString() : String = v.toString()
+  override val variable = v
+  override def toInt = v
+  def unary_~() : Literal = NegativeLiteral(v)
 }
 
-case class NegativeLiteral(name: String) extends Literal {
-  override def toString() : String = "~" + name
-  override def variale() = name
+case class NegativeLiteral(v :Int) extends Literal {
+  override def toString() : String = "-" + v.toString()
+  override val variable = v
+  override def toInt = -v
+  def unary_~() : Literal = PositiveLiteral(v)
+}
+
+object Literal {
+  def create(v : Int) = PositiveLiteral(v)
 }
 
 case class Clause(lits: List[Literal]) {
+  override  def toString() : String = 
+    lits.map(_.toString()).mkString("(", " + ", ")")
 }
