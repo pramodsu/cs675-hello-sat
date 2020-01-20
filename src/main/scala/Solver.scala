@@ -4,10 +4,8 @@ import org.sat4j.core._
 import org.sat4j.minisat._
 import scala.collection.mutable.HashMap
 
-class Solver()
+trait ISolver
 {
-  val solver = SolverFactory.newDefault()
-
   def addClause(cl : Clause) : Unit = {
     addClause_(cl.lits)
   }
@@ -15,6 +13,28 @@ class Solver()
   def addClause(lits: Literal*) : Unit = {
     addClause_(lits)
   }
+
+  def solve() : Boolean = {
+    solve(Seq.empty)
+  }
+
+  def modelValue(l : Literal) : Boolean = {
+    val b = modelValue(l.variable)
+    l match {
+      case PositiveLiteral(_) => b
+      case NegativeLiteral(_) => !b
+    }
+  }
+
+  // to be implemented by sub-class
+  def addClause_(lits: Seq[Literal]) : Unit
+  def solve(assumps: Seq[Literal]) : Boolean
+  def modelValue(v : Int) : Boolean
+}
+
+class Solver extends ISolver
+{
+  val solver = SolverFactory.newDefault()
 
   def addClause_(lits : Seq[Literal]) : Unit = {
     // create new variables, if not already present.
@@ -32,10 +52,6 @@ class Solver()
   }
 
 
-  def solve() : Boolean = {
-    solver.isSatisfiable()
-  }
-
   def solve(assumps: Seq[Literal]) : Boolean = {
     if (assumps.size == 0) {
       solver.isSatisfiable()
@@ -47,13 +63,5 @@ class Solver()
 
   def modelValue(v : Int) : Boolean = {
     solver.model(v)
-  }
-
-  def modelValue(l : Literal) = {
-    val b = solver.model(l.variable)
-    l match {
-      case PositiveLiteral(_) => b
-      case NegativeLiteral(_) => !b
-    }
   }
 }
